@@ -1,0 +1,44 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: Installing dnf and epel-release
+    yum:
+      name:
+        - epel-release
+        - dnf
+    when: ansible_distribution == "CentOS"
+
+  - name: dpkg fixing in Ubuntu
+    shell:
+      dpkg --configure -a
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php for Ubuntu servers
+    tags: apache,apache2,ubuntu
+    apt:
+      name:
+        - apache2
+        - libapache2-mod-php
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install apache and php for CentOS servers
+    tags: apache,apache2,ubuntu
+    dnf:
+      name:
+        - httpd
+        - php
+      state: latest
+    when: ansible_distribution == "CentOS"
+
+- hosts: ubuntu_server
+  become: true
+  roles:
+    - ubuntu_server
+
+- hosts: centOS_server
+  become: true
+  roles:
+    - centOS_server
